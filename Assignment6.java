@@ -5,8 +5,8 @@ import java.util.*;
  */
 class Assignment6 {
 
-    Random random = new Random(212798);
-    double alpha = 1.159;
+    private Random random = new Random(21);
+    private double alpha = 1.15;
     private static final int ROWS = 50; //number of grid rows
     private static final int COLUMNS = 50;  //number of grid columns
     private int[][] a = new int[ROWS + 2][COLUMNS + 2]; //grid displayed as a array of integers
@@ -41,14 +41,14 @@ class Assignment6 {
 
         //add neighbours to the first and last rows
         for (int j = 1; j <= COLUMNS; ++j) {
-            a[0][j] = a[ROWS][j % (COLUMNS + 1)];
-            a[ROWS + 1][j] = a[1][j % (COLUMNS + 1)];
+            a[0][j] = a[ROWS][j];
+            a[ROWS + 1][j] = a[1][j];
         }
 
         //add neighbours to the first and last columns
         for (int i = 1; i <= ROWS; ++i) {
-            a[i][0] = a[i % (ROWS + 1)][COLUMNS];
-            a[i][COLUMNS + 1] = a[i % (ROWS + 1)][1];
+            a[i][0] = a[i][COLUMNS];
+            a[i][COLUMNS + 1] = a[i][1];
         }
     }
 
@@ -70,13 +70,13 @@ class Assignment6 {
         score[ROWS + 1][COLUMNS + 1] = score[1][1];
 
         for (int j = 1; j <= COLUMNS; ++j) {
-            score[0][j] = score[ROWS][j % (COLUMNS + 1)];
-            score[ROWS + 1][j] = score[1][j % (COLUMNS + 1)];
+            score[0][j] = score[ROWS][j];
+            score[ROWS + 1][j] = score[1][j];
         }
 
         for (int i = 1; i <= ROWS; ++i) {
-            score[i][0] = score[i % (ROWS + 1)][COLUMNS];
-            score[i][COLUMNS + 1] = score[i % (ROWS + 1)][1];
+            score[i][0] = score[i][COLUMNS];
+            score[i][COLUMNS + 1] = score[i][1];
         }
     }
 
@@ -209,7 +209,7 @@ class Assignment6 {
             }
             virtualNeighbours();
             ++numberOfRounds;
-        } while (numberOfRounds <= 10);
+        } while (numberOfRounds <= 20);
     }
 
     public static void main(String[] args) {
