@@ -26,9 +26,9 @@ class PlayingField extends JPanel /* possible implements ... */ {
 
     private Timer timer;
 
-    private static final int ROWS = 4; //number of grid rows
+    private static final int ROWS = 50; //number of grid rows
 
-    private static final int COLUMNS = 4;  //number of grid columns
+    private static final int COLUMNS = 50;  //number of grid columns
 
     private static final int NEIGHBOURS = 9;
 
@@ -85,12 +85,10 @@ class PlayingField extends JPanel /* possible implements ... */ {
         return (grid[row][col].isCooperating() ? score - 1 : score * getAlpha());
     }
 
-    void getHighScore(int row, int col) {
-        int k = -1;
+    double getHighScore(int row, int col) {
         double highScore = -1;
         double score;
         Neighbours[] neighbours = getNeighbourhood(row, col);
-        Neighbours[] winners = new Neighbours[NEIGHBOURS];
 
         for (int i = 0; i < neighbours.length; ++i) {
             score = grid[neighbours[i].getRow()][neighbours[i].getColumn()].getScore();
@@ -98,6 +96,15 @@ class PlayingField extends JPanel /* possible implements ... */ {
                 highScore = score;
             }
         }
+        return highScore;
+    }
+
+    void setStrategy(int row, int col) {
+        int k = -1;
+        double highScore = getHighScore(row, col);
+        double score;
+        Neighbours[] neighbours = getNeighbourhood(row, col);
+        Neighbours[] winners = new Neighbours[NEIGHBOURS];
 
         for (int i = 0; i < neighbours.length; ++i) {
             int x = neighbours[i].getRow();
@@ -121,12 +128,42 @@ class PlayingField extends JPanel /* possible implements ... */ {
     void print() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
-                System.out.print(grid[x][y].coop + " ");
+                if (grid[x][y].getCoop()) {
+                    System.out.print(1 + " ");
+                } else {
+                    System.out.print(0 + " ");
+                }
             }
             System.out.println();
         }
     }
 
+    void fillInitialGrid() {
+        for (int x = 0; x <= ROWS + 1; ++x) {
+            for (int y = 0; y <= COLUMNS + 1; ++y) {
+                grid[x][y] = new Patch(x, y, 0.0, strategy[x][y]);
+            }
+        }
+    }
+
+    void determineScores(Patch[][] grid) {
+        for (int x = 1; x <= ROWS; ++x) {
+            for (int y = 1; y <= COLUMNS; ++y) {
+                grid[x][y].setScore(calculateScore(x, y));
+            }
+        }
+        virtualNeighbours();
+    }
+
+    void determineNextStrategies(Patch[][] grid) {
+        for (int x = 1; x <= ROWS; ++x) {
+            for (int y = 1; y <= COLUMNS; ++y) {
+                setStrategy(x, y);
+            }
+        }
+        virtualNeighbours();
+    }
+    
     /**
      * Calculate and execute one step in the simulation.
      */
@@ -134,27 +171,16 @@ class PlayingField extends JPanel /* possible implements ... */ {
         // ...
         strategy = new boolean[ROWS + 2][COLUMNS + 2];
         grid = new Patch[ROWS + 2][COLUMNS + 2];
+
         setGrid(strategy);
-        for (int x = 1; x <= ROWS; ++x) {
-            for (int y = 1; y <= COLUMNS; ++y) {
-                grid[x][y] = new Patch(x, y, 0.0, strategy[x][y]);
-            }
-        }
-        virtualNeighbours();
+        
+        fillInitialGrid();
+        print();
 
-        for (int x = 1; x <= ROWS; ++x) {
-            for (int y = 1; y <= COLUMNS; ++y) {
-                grid[x][y].setScore(calculateScore(x, y));
-            }
-        }
-        virtualNeighbours();
-
-        for (int x = 1; x <= ROWS; ++x) {
-            for (int y = 1; y <= COLUMNS; ++y) {
-                getHighScore(x, y);
-            }
-        }
-        virtualNeighbours();
+        System.out.println("round 2");
+        
+        determineScores(grid);
+        determineNextStrategies(grid);
         print();
     }
 
@@ -169,7 +195,7 @@ class PlayingField extends JPanel /* possible implements ... */ {
      */
     public double getAlpha() {
         // ...
-        return 1; // CHANGE THIS
+        return 1.1; // CHANGE THIS
     }
 
     /**

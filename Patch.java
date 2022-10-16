@@ -13,15 +13,10 @@ import java.util.Random;
  * @id 1806769
  */
 class Patch {
-    public boolean coop;
+    private boolean coop;
     private int row;
     private int col;
-    public double score;
-
-    Patch(int x, int y) {
-        this.row = x;
-        this.col = y;
-    }
+    private double score;
 
     Patch(int x, int y, double score, boolean coop) {
         this.row = x;
@@ -70,4 +65,7 @@ class Patch {
         return this.score;
     }
 
+    boolean getCoop() {
+        return this.coop;
+    }
 }
