@@ -1,3 +1,5 @@
+import java.util.*;
+
 /**
  * Patch.
  * 
@@ -11,15 +13,17 @@
  * @author NAME
  * @id ID
  */
-class Patch {
+class Patch extends PlayingField {
+    public double score = 0;
+    protected int x;
+    protected int y;
     /**
      * Determine if this patch is cooperating.
      * 
      * @return true if and only if the patch is cooperating.
      */
     boolean isCooperating() {
-        //...
-        return false; // CHANGE THIS
+        return true; // CHANGE THIS
     }
     
     /**
@@ -27,15 +31,22 @@ class Patch {
      * 
      * @param isC use cooperation strategy.
      */
-    void setCooperating(boolean isC) {
-        //...
+    public void setCooperating(boolean isC) {
+        isC = RANDOM.nextBoolean();
     }
     
     /**
      * Toggle strategy between C and D.
      */
-    void toggleStrategy() {
-        // ...
+    public void toggleStrategy() {
+        double maxScore = this.score;
+        int[][] Neighbours = GetNeighbours();
+        for (int i = 0;i<Neighbours.length; i++){
+            if (grid[Neighbours[i][0]][Neighbours[i][1]].score > maxScore){
+
+            }
+        }
+
     }
     
     /**
@@ -44,7 +55,17 @@ class Patch {
      * @return the score
      */
     double getScore() {
-        //...
-        return 0.0; // CHANGE THIS
+        int[][] Neighbours;
+        Neighbours = GetNeighbours();
+        if (this.isCooperating() == false){
+            for (int i=0; i<Neighbours.length;i++){
+                
+            }
+        }
+        return score; // CHANGE THIS
+    }
+    public int[][] GetNeighbours(){
+        int[][] Neighbours = new int[8][2];
+        return Neighbours;
     }
 }
