@@ -1,5 +1,4 @@
-import java.util.*;
-
+import java.util.Random;
 /**
  * Patch.
  * 
@@ -8,45 +7,58 @@ import java.util.*;
  * part Patch
  * assignment copyright Kees Huizing
  * 
- * @author NAME
- * @id ID
- * @author NAME
- * @id ID
+ * @author Alexandru Dicu
+ * @id 1837370
+ * @author Jules Anseaume
+ * @id 1806769
  */
-class Patch extends PlayingField {
-    public double score = 0;
-    protected int x;
-    protected int y;
+class Patch {
+    public boolean coop;
+    private int row;
+    private int col;
+    public double score;
+
+    Patch(int x, int y) {
+        this.row = x;
+        this.col = y;
+    }
+
+    Patch(int x, int y, double score, boolean coop) {
+        this.row = x;
+        this.col = y;
+        this.score = score;
+        this.coop = coop;
+    }
+
+    void setScore(double score) {
+        this.score = score;
+    }
+
     /**
      * Determine if this patch is cooperating.
      * 
      * @return true if and only if the patch is cooperating.
      */
     boolean isCooperating() {
-        return true; // CHANGE THIS
+        return this.coop;
     }
+
     
     /**
      * Set strategy to cooperate (C) when isC is true, D otherwise.
      * 
      * @param isC use cooperation strategy.
      */
-    public void setCooperating(boolean isC) {
-        isC = RANDOM.nextBoolean();
+    void setCooperating(boolean isC) {
+        this.coop = isC;
     }
+    
     
     /**
      * Toggle strategy between C and D.
      */
-    public void toggleStrategy() {
-        double maxScore = this.score;
-        int[][] Neighbours = GetNeighbours();
-        for (int i = 0;i<Neighbours.length; i++){
-            if (grid[Neighbours[i][0]][Neighbours[i][1]].score > maxScore){
-
-            }
-        }
-
+    void toggleStrategy() {
+        this.setCooperating(!this.coop);
     }
     
     /**
@@ -55,17 +67,7 @@ class Patch extends PlayingField {
      * @return the score
      */
     double getScore() {
-        int[][] Neighbours;
-        Neighbours = GetNeighbours();
-        if (this.isCooperating() == false){
-            for (int i=0; i<Neighbours.length;i++){
-                
-            }
-        }
-        return score; // CHANGE THIS
+        return this.score;
     }
-    public int[][] GetNeighbours(){
-        int[][] Neighbours = new int[8][2];
-        return Neighbours;
-    }
+
 }
