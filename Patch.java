@@ -1,4 +1,3 @@
-import java.util.Random;
 import java.awt.*;
 import java.awt.event.*;
 import javax.swing.*;
@@ -16,18 +15,14 @@ import javax.swing.border.LineBorder;
  * @author Jules Anseaume
  * @id 1806769
  */
-class Patch extends JButton{
+
+class Patch extends JButton {
     private boolean coop;
-    private int row;
-    private int col;
     private double score;
     private boolean nextStrategy;
 
-    Patch(int x, int y, double score, boolean coop) {
-        this.row = x;
-        this.col = y;
+    Patch(double score) {
         this.score = score;
-        this.coop = coop;
         this.nextStrategy = coop;
         this.setBorder(new LineBorder(Color.black, 0));
         this.addActionListener(new ActionListener() {
@@ -84,9 +79,5 @@ class Patch extends JButton{
      */
     double getScore() {
         return this.score;
-    }
-
-    boolean getCoop() {
-        return this.coop;
     }
 }

@@ -1,10 +1,8 @@
-import java.util.Random;
-import javax.swing.JPanel;
-import javax.swing.SwingUtilities;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
-import javax.swing.*;
+import java.util.Random;
+import javax.swing.JPanel;
+import javax.swing.Timer;
 
 /**
  * Playingfield.
@@ -20,26 +18,25 @@ import javax.swing.*;
  * @author Jules Anseaume
  * @id 1806769
  */
-class PlayingField extends JPanel /* possible implements ... */ {
-
-    private Patch[][] grid = new Patch[ROWS + 2][COLUMNS + 2];
-    private boolean[][] strategy = new boolean[ROWS + 2][COLUMNS + 2];
+class PlayingField extends JPanel {
 
     private double alpha; // defection award factor
 
     private Timer timer;
 
-    private static final int ROWS = 50; //number of grid rows
-
-    private static final int COLUMNS = 50;  //number of grid columns
-
-    private static final int NEIGHBOURS = 9;
-
     // random number genrator
     private static final long SEED = 37L; // seed for random number generator; any number goes
     public static final Random RANDOM = new Random(SEED);
 
-    // ...
+    private static final int ROWS = 50; //number of grid rows
+
+    private static final int COLUMNS = 50;  //number of grid columns
+
+    private static final int NEIGHBOURS = 9;   //total number of patches in a neighbourhood
+
+    private Patch[][] grid = new Patch[ROWS + 2][COLUMNS + 2];
+
+    private boolean rule = false;
 
     public PlayingField() {
         this.setLayout(new GridLayout(ROWS, COLUMNS));
@@ -51,11 +48,11 @@ class PlayingField extends JPanel /* possible implements ... */ {
         timer.setInitialDelay(0);
     }
 
-    int getSpeed() {
+    int getDisplayTime() {
         return timer.getDelay();
     }
 
-    void setSpeed(int ms) {
+    void setDisplayTime(int ms) {
         timer.setDelay(ms);
     }
 
@@ -75,11 +72,19 @@ class PlayingField extends JPanel /* possible implements ... */ {
         return timer.isRunning();
     }
     
+    void setRule(boolean rule) {
+        this.rule = rule;
+    }
+
+    boolean getRule() {
+        return this.rule;
+    }
+    
     /**
      * Create imaginary neighbours to the grid so that every array element has neighbours
      * around them.
      */
-    void getVirtualNeighbours() {
+    void addVirtualNeighbours() {
         //add neighbours to the corners
         grid[0][0] = grid[ROWS][COLUMNS];
         grid[ROWS + 1][0] = grid[1][COLUMNS];
@@ -136,49 +141,45 @@ class PlayingField extends JPanel /* possible implements ... */ {
     }
 
     void setStrategy(int row, int col) {
-        int k = -1;
+        int k = -1; //variable for indexing the array of possible winners
         double highScore = getHighScore(row, col);
         double score;
         Neighbours[] neighbours = getNeighbourhood(row, col);
         Neighbours[] winners = new Neighbours[NEIGHBOURS];
 
         for (int i = 0; i < neighbours.length; ++i) {
-            int x = neighbours[i].getRow();
-            int y = neighbours[i].getColumn();
-            boolean strategy = neighbours[i].getStrategy();
+            int x = neighbours[i].getRow();  //variable for simplifying a neighbour's row
+            int y = neighbours[i].getColumn();  //variable for simplifying a neighbour's column
+            boolean strategy = neighbours[i].getStrategy(); //the neighbour's strategy
             score = grid[x][y].getScore();
             if (score == highScore) {
                 winners[++k] = new Neighbours(x, y, strategy);
             }
         }
-        int index = k;
+        int index = k;  //the index of the chosen winner
+
+        //randomize the winner index if there are more winners
         if (k > 0) {
             index = RANDOM.nextInt(k + 1);
         }
         
-        grid[row][col].setNextStrategy(winners[index].getStrategy());
-    }
-
-    void print() {
-        for (int x = 1; x <= ROWS; ++x) {
-            for (int y = 1; y <= COLUMNS; ++y) {
-                if (grid[x][y].isCooperating()) {
-                    System.out.print(1 + " ");
-                } else {
-                    System.out.print(0 + " ");
-                }
+        //set the next strategy of the patch
+        if (getRule()) {
+            if (grid[row][col].getScore() == highScore) {
+                grid[row][col].setNextStrategy(grid[row][col].isCooperating());
+            } else {
+                grid[row][col].setNextStrategy(winners[index].getStrategy());
             }
-            System.out.println();
+        } else {
+            grid[row][col].setNextStrategy(winners[index].getStrategy());
         }
     }
 
-    void fillInitialGrid() {
+    void initializeGrid() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
-                grid[x][y] = new Patch(x, y, 0.0, strategy[x][y]);
-                if (x > 0 && x <= ROWS && y > 0 && y <= COLUMNS) {
-                    this.add(grid[x][y]);
-                }
+                grid[x][y] = new Patch(0.0);  //initializing the patch
+                this.add(grid[x][y]);  //adding the patch to the field
             }
         }
     }
@@ -186,28 +187,33 @@ class PlayingField extends JPanel /* possible implements ... */ {
     void randomizeGrid() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
+                //set a random strategy for the patches
                 grid[x][y].setCooperating(RANDOM.nextBoolean());
             }
         }
-        getVirtualNeighbours();
+        addVirtualNeighbours();
+    }
+
+    void colorisePatches() {
+        for (int x = 1; x <= ROWS; ++x) {
+            for (int y = 1; y <= COLUMNS; ++y) {
+                grid[x][y].setBackground(
+                    (grid[x][y].isCooperating() ? Color.blue : Color.red)
+                );
+            }
+        }
     }
 
     void determineScores() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
                 grid[x][y].setScore(calculateScore(x, y));
-                //grid[x][y].setText(Long.toString(Math.round(grid[x][y].getScore())));
             }
         }
-        getVirtualNeighbours();
+        addVirtualNeighbours();
     }
 
-    void determineNextStrategies() {
-        for (int x = 1; x <= ROWS; ++x) {
-            for (int y = 1; y <= COLUMNS; ++y) {
-                setStrategy(x, y);
-            }
-        }
+    void confirmNewStrategies() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
                 if (grid[x][y].isCooperating() != grid[x][y].getNextStrategy()) {
@@ -218,26 +224,24 @@ class PlayingField extends JPanel /* possible implements ... */ {
                 }
             }
         }
-        getVirtualNeighbours();
     }
     
+    void determineNextRound() {
+        for (int x = 1; x <= ROWS; ++x) {
+            for (int y = 1; y <= COLUMNS; ++y) {
+                setStrategy(x, y);
+            }
+        }
+        confirmNewStrategies();
+        addVirtualNeighbours();
+    }
     /**
      * Calculate and execute one step in the simulation.
      */
     public void step() {
-        for (int x = 1; x <= ROWS; ++x) {
-            for (int y = 1; y <= COLUMNS; ++y) {
-                grid[x][y].setBackground(
-                    (grid[x][y].isCooperating() ? Color.blue : Color.red)
-                );
-            }
-        }
+        colorisePatches();
         determineScores();
-        determineNextStrategies();
-    }
-
-    Patch[][] getPatches() {
-        return this.grid;
+        determineNextRound();
     }
 
     public void setAlpha(double alpha) {
@@ -250,8 +254,7 @@ class PlayingField extends JPanel /* possible implements ... */ {
      * @return alpha value for this field.
      */
     public double getAlpha() {
-        // ...
-        return this.alpha; // CHANGE THIS
+        return this.alpha;
     }
 
     /**
@@ -301,24 +304,6 @@ class PlayingField extends JPanel /* possible implements ... */ {
             inGrid[i][0] = inGrid[i][COLUMNS];
             inGrid[i][COLUMNS + 1] = inGrid[i][1];
         }
-    }
-
-    int getRows() {
-        return this.ROWS;
-    }
-
-    int getColumns() {
-        return this.COLUMNS;
-    }
-
-    void run() {
-        fillInitialGrid();
-        print();
-        step();
-        print();
-    }
-    public static void main(String[] args) {
-        new PlayingField().run();
     }
 }
 
