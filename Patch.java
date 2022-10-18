@@ -1,4 +1,8 @@
 import java.util.Random;
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+import javax.swing.border.LineBorder;
 /**
  * Patch.
  * 
@@ -12,21 +16,37 @@ import java.util.Random;
  * @author Jules Anseaume
  * @id 1806769
  */
-class Patch {
+class Patch extends JButton{
     private boolean coop;
     private int row;
     private int col;
     private double score;
+    private boolean nextStrategy;
 
     Patch(int x, int y, double score, boolean coop) {
         this.row = x;
         this.col = y;
         this.score = score;
         this.coop = coop;
+        this.nextStrategy = coop;
+        this.setBorder(new LineBorder(Color.black, 0));
+        this.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                toggleStrategy();
+            }
+        });
     }
 
     void setScore(double score) {
         this.score = score;
+    }
+
+    void setNextStrategy(boolean nextStrategy) {
+        this.nextStrategy = nextStrategy;
+    }
+
+    boolean getNextStrategy() {
+        return this.nextStrategy;
     }
 
     /**
@@ -46,6 +66,7 @@ class Patch {
      */
     void setCooperating(boolean isC) {
         this.coop = isC;
+        this.setBackground(isC ? Color.blue : Color.red);
     }
     
     
