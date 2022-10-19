@@ -71,11 +71,19 @@ class PlayingField extends JPanel {
     boolean isRunning() {
         return timer.isRunning();
     }
-    
+    /**
+     * Sets the rule to the (boolean rule) given
+     *
+     * @param rule, 
+     */
     void setRule(boolean rule) {
         this.rule = rule;
     }
 
+    /**
+     *
+     * @returns rule, used for
+     */
     boolean getRule() {
         return this.rule;
     }
