@@ -22,7 +22,7 @@ class PlayingField extends JPanel {
 
     private double alpha; // defection award factor
 
-    private Timer timer;
+    private Timer timer; //timer for delay between actions
 
     // random number genrator
     private static final long SEED = 37L; // seed for random number generator; any number goes
@@ -34,11 +34,12 @@ class PlayingField extends JPanel {
 
     private static final int NEIGHBOURS = 9;   //total number of patches in a neighbourhood
 
-    private Patch[][] grid = new Patch[ROWS + 2][COLUMNS + 2];
+    private Patch[][] grid = new Patch[ROWS + 2][COLUMNS + 2]; //initializes the grid of size ROWS*COLUMNS
 
-    private boolean rule = false;
+    private boolean rule = false; //boolean to decide whether to use the alternative rule
+                                  //Player with high score doesn't necesarily change strategies if other player has same highest score
 
-    public PlayingField() {
+    public PlayingField() { //Constructor of PlayingField
         this.setLayout(new GridLayout(ROWS, COLUMNS));
         timer = new Timer(1000, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
@@ -47,19 +48,41 @@ class PlayingField extends JPanel {
         });
         timer.setInitialDelay(0);
     }
-
+       
+    
+    /**
+     * returns the delay between steps, or for the animations
+     *
+     * @param timer, used to create a delay between steps, and to create an animation
+     */
     int getDisplayTime() {
         return timer.getDelay();
     }
-
+    
+    
+    /**
+     * Sets the timer of object PlayingField to ms, a number in milliseconds
+     *
+     * @param ms, used to create a delay between steps (in milliseconds)
+     */
     void setDisplayTime(int ms) {
         timer.setDelay(ms);
     }
-
+    
+    
+    /**
+     * Gets the timer of the object PlayingField
+     *
+     * @returns timer, Timer object used to delay actions in the grid
+     */
     Timer getTimer() {
         return this.timer;
     }
 
+    
+    /**
+     * Starts or stops the steps of the grid, depending on if the timer > 0
+     */
     void toggleSimulation() {
         if (timer.isRunning()) {
             timer.stop();
@@ -68,13 +91,18 @@ class PlayingField extends JPanel {
         }
     }
 
+    /**
+     * Gets whether or not the timer is activated, so if the steps are done or stopped
+     *
+     * @returns true or false, depending on if the timer is activated
+     */
     boolean isRunning() {
         return timer.isRunning();
     }
     /**
      * Sets the rule to the (boolean rule) given
      *
-     * @param rule, 
+     * @param rule, boolean used in case we change rules for toggling strategies
      */
     void setRule(boolean rule) {
         this.rule = rule;
@@ -82,7 +110,7 @@ class PlayingField extends JPanel {
 
     /**
      *
-     * @returns rule, used for
+     * @returns rule, boolean used in case we change rules for toggling strategies
      */
     boolean getRule() {
         return this.rule;
@@ -123,6 +151,14 @@ class PlayingField extends JPanel {
         return neighbourhood;
     }
 
+    
+    /**
+     * return the score of the Patch after a round,
+     *  -1 if cooperating (not counting itself) or *Alpha if defecting
+     *
+     * @param row, row of the patch we are now on
+     * @param col, column of the patch we are now on
+     */
     double calculateScore(int row, int col) {
         double score = 0.0;
         Neighbours[] neighbours = getNeighbourhood(row, col);
@@ -133,7 +169,14 @@ class PlayingField extends JPanel {
         }
         return (grid[row][col].isCooperating() ? score - 1 : score * getAlpha());
     }
-
+    
+    
+    /**
+     * returns the highscore in a neighbourhood, around the Patch
+     *
+     * @param row, row of the patch we are on
+     * @param col, column of the patch we are on
+     */
     double getHighScore(int row, int col) {
         double highScore = -1;
         double score;
@@ -148,6 +191,10 @@ class PlayingField extends JPanel {
         return highScore;
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     void setStrategy(int row, int col) {
         int k = -1; //variable for indexing the array of possible winners
         double highScore = getHighScore(row, col);
@@ -183,6 +230,10 @@ class PlayingField extends JPanel {
         }
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     void initializeGrid() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
@@ -192,6 +243,10 @@ class PlayingField extends JPanel {
         }
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     void randomizeGrid() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
@@ -202,6 +257,10 @@ class PlayingField extends JPanel {
         addVirtualNeighbours();
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     void colorisePatches() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
@@ -212,6 +271,10 @@ class PlayingField extends JPanel {
         }
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     void determineScores() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
@@ -221,6 +284,10 @@ class PlayingField extends JPanel {
         addVirtualNeighbours();
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     void confirmNewStrategies() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
@@ -234,6 +301,10 @@ class PlayingField extends JPanel {
         }
     }
     
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     void determineNextRound() {
         for (int x = 1; x <= ROWS; ++x) {
             for (int y = 1; y <= COLUMNS; ++y) {
@@ -252,6 +323,10 @@ class PlayingField extends JPanel {
         determineNextRound();
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     public void setAlpha(double alpha) {
         this.alpha = alpha;
     }
@@ -320,20 +395,32 @@ class Neighbours {
     private int col;
     private boolean coop;
 
-    Neighbours(int row, int col, boolean coop) {
+    Neighbours(int row, int col, boolean coop) { //initializing Constructor of Neighbours class
         this.row = row;
         this.col = col;
         this.coop = coop;
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     int getRow() {
         return this.row;
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     int getColumn() {
         return this.col;
     }
 
+    /**
+     * Create imaginary neighbours to the grid so that every array element has neighbours
+     * around them.
+     */
     boolean getStrategy() {
         return this.coop;
     }
