@@ -31,15 +31,27 @@ class Patch extends JButton {
             }
         });
     }
-
+    /**
+     * sets the score of the Patch to a double, calculated in PlayingField.java
+     *
+     * @param score, sets score of patch to (double score)
+     */
     void setScore(double score) {
         this.score = score;
     }
-
+    /**
+     * sets the nextStrategy to a certain boolean nexStrategy, given through PlayingField.java
+     *
+     * @param nextStrategy, boolean that determines cooperation or defection
+     */
     void setNextStrategy(boolean nextStrategy) {
         this.nextStrategy = nextStrategy;
     }
-
+    /* 
+     * Get the next strategy of this patch
+     * 
+     * @returns the next strategy used by the patch we call
+     */
     boolean getNextStrategy() {
         return this.nextStrategy;
     }
